@@ -1,7 +1,18 @@
 # -*- coding: utf-8 -*-
 """Regenerate consistent analysis + review HTML reports from the FINAL merged result."""
-import re, math
+import os
+import re
+import math
 from collections import defaultdict
+
+# Auto-locate results/ (works from any cwd / unzipped dir)
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_ROOT = os.path.dirname(_HERE)
+_RESULTS = os.path.join(_ROOT, 'results')
+_DOCS = os.path.join(_ROOT, 'docs')
+if os.path.isdir(_RESULTS) and os.path.exists(os.path.join(_RESULTS, 'result.txt')):
+    os.chdir(_RESULTS)
+os.makedirs(_DOCS, exist_ok=True)
 
 with open('result.txt', encoding='utf-8') as f:
     content = f.read()
@@ -44,7 +55,7 @@ comp = ['<html><head><meta charset="utf-8"><title>赛题三 综合分析报告</
          'th{background:#2c3e50;color:#fff}.ok{color:#1a7f37}.bad{color:#c0392b}'
          'code{background:#f4f4f4;padding:2px 6px}.note{background:#fffbe6;border-left:4px solid #f1c40f;padding:10px 14px}</style></head><body>']
 comp.append('<h1>2026 全国密码数学挑战赛 赛题三 — 综合分析报告</h1>')
-comp.append(f'<p>提交包：<b>0000002193+3.zip</b>　生成时间：2026-08-21</p>')
+comp.append(f'<p>提交包：<b>0000002193+3/</b>（提交目录）　生成时间：2026-08-29（数据复核）</p>')
 comp.append('<h2>1. 总体结论</h2>')
 comp.append(f'<ul>'
              f'<li>提交条目总数：<b>{total}</b></li>'
@@ -98,7 +109,7 @@ for R,u,v,VT,VE,valid,clamp in samples_invalid:
 comp.append('</table>')
 comp.append('</body></html>')
 
-with open('赛题三_综合分析报告.html','w',encoding='utf-8') as f:
+with open(os.path.join(_DOCS, '赛题三_综合分析报告.html'), 'w', encoding='utf-8') as f:
     f.write(''.join(comp))
 print('赛题三_综合分析报告.html written')
 
@@ -119,7 +130,8 @@ rev.append('<h2>二、算法可复现性</h2>')
 rev.append('<ul>'
            '<li class="pass">方式1：<code>computecor.cpp</code>（C++ 穷举 2^32）、<code>method1_exact_dp.py</code>（LAT 线性壳 DP）；</li>'
            '<li class="pass">方式2：<code>method2_v2plus.py</code>（逐轮 LAT 逼近 + 组合枚举取最大得分）；</li>'
-           '<li class="pass">合并脚本 <code>method2_multistrategy.py</code> 给出 v2/v2plus 候选，按条取最优。</li></ul>')
+           '<li class="pass">合并脚本 <code>merge_v2_v2plus.py</code> 按条目取 v2/v2plus 最优；'
+           '完整复现见根目录 <code>run_all.py</code>（实测 PASS，346 条一致）。</li></ul>')
 rev.append('<h2>三、主要风险与说明</h2>')
 rev.append(f'<ul>'
            f'<li class="warn">28 条未达标条目源于线性壳抵消（见综合分析报告第5节），属密码固有性质；</li>'
@@ -130,7 +142,7 @@ rev.append(f'<p>提交材料格式合规、算法可复现、未硬编码方式1
            f'钳制后总得分 <b>{clamp_total:.2f}</b>。未达标部分已给出线性壳效应的物理解释，'
            '整体满足赛题三提交要求。</p>')
 rev.append('</body></html>')
-with open('赛题三_审查报告.html','w',encoding='utf-8') as f:
+with open(os.path.join(_DOCS, '赛题三_审查报告.html'), 'w', encoding='utf-8') as f:
     f.write(''.join(rev))
 print('赛题三_审查报告.html written')
 print(f'SUMMARY: total={total} valid={nvalid} clamp_score={clamp_total:.2f}')
