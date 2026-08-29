@@ -1,11 +1,17 @@
 自评得分
-生成时间: 2026-08-21
+生成时间: 2026-08-21（2026-08-29 复现链路验证、报告完善）
 结果文件: result.txt（官方格式 @(r, u, v, V_T, V_E)）
-算法文件: method2_v2plus.py（方式2 主算法）；method1_exact_dp.py（方式1 精确校验）
+算法文件: method2_v2plus.py（方式2 主算法）；method1_exact_dp.py（方式1 精确校验）；
+         merge_v2_v2plus.py（v2/v2plus 按条取最优合并）
 总条目: 346
 有效条目: 318
 总得分（钳制后，负分计0）: 2996.53
 总得分（未钳制原始）: 2849.86
+
+一键复现:
+  在提交目录根执行 `python run_all.py`，即可从 result.txt (含 V_T) 出发
+  完整复现 result_method2_v2.txt → result_method2_v2plus.txt → result_method2_merged.txt
+  并与 result.txt 逐条校验（实测：[PASS] 346 条完全一致）。
 
 计分公式: 单条得分 = log2(2^(2r) * |V_E|)，负分按 0 计
 有效条件: V_E ∈ [0.75*V_T, 1.25*V_T]，且 V_E != 0，u != 0，v != 0

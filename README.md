@@ -117,8 +117,9 @@ C(u,v) = Σ_{所有路线 Γ: u→v} ∏(LAT[α][β]/16) · 符号
    `|V_E| = 0.5^{n₁}·0.375^{n₂}·0.25^{n₃}·0.125^{n₄}`，
    在落入 `[0.75·V_T, 1.25·V_T]` 且与 `V_T` 同号的组合中，取单条得分最大者作为该条目的估计。
 
-实现见 `src/method2_v2plus.py`（主算法）与 `src/method2_multistrategy.py`（多策略候选，
-最终按条目取 v2 / v2plus 中最优者合并为 `results/result_method2_merged.txt`）。
+实现见 `src/method2_v2plus.py`（主算法）与 `src/method2_multistrategy.py`（多策略候选），
+按条目取 v2 / v2plus 中最优者合并为 `results/result_method2_merged.txt`，
+合并逻辑见 `src/merge_v2_v2plus.py`。
 
 ### 未达标条目的线性壳解释
 
@@ -132,50 +133,58 @@ C(u,v) = Σ_{所有路线 Γ: u→v} ∏(LAT[α][β]/16) · 符号
 ## 目录结构
 
 ```
-spn-linear-cryptanalysis/
-├── README.md
+0000002193+3/                     # 2026 密码数学挑战赛 · 赛题三 · 提交目录
+├── README.md                     # 本文件
 ├── LICENSE
-├── .gitignore
-├── docs/                          # 论文与分析报告
-│   ├── saiti3_paper.docx          #   竞赛论文（方式1/方式2 分章论述）
+├── run_all.py                    # ★ 一键复现（v2 → v2plus → merge → 校验）
+├── docs/                         # 论文与分析报告
+│   ├── saiti3_paper.docx         #   ★ 竞赛论文（带样式 / 1.5倍行距 / 页码 / 3 张插图）
+│   ├── chart_corr_vs_rounds.png  #   图1 |V_T| vs R（衰减+平台效应）
+│   ├── chart_ve_vs_vt.png        #   图2 |V_E| vs |V_T|（±25% 窗口）
+│   ├── chart_valid_by_round.png  #   图3 各轮有效条目数
 │   ├── 赛题三_综合分析报告.html
 │   └── 赛题三_审查报告.html
-├── results/                       # 结果数据
-│   ├── result.txt                 #   ★ 最终提交（346 条，318 有效）
-│   ├── official_submit.txt        #   同上（官方格式副本）
-│   ├── result_method2_v2.txt      #   方式2 v2：c^R 固定取值   → 254 有效
-│   ├── result_method2_v2plus.txt  #   方式2 v2+：逐轮组合枚举 → 266 有效
-│   ├── result_method2_merged.txt  #   ★ 按条目取最优的合并结果 → 318 有效
-│   ├── result_method2_dominant.txt#   主导单路线法（探索，未达标）
-│   ├── 自评得分.txt                #   自评得分与合规性说明
-│   └── 0000002193+3.zip           #   最终提交包
-├── src/                           # 核心算法实现
-│   ├── computecor.cpp / Makefile  #   方式1 穷举（C++）
-│   ├── method1_exact_dp.py        #   方式1 精确 LAT 线性壳 DP（含自检）
-│   ├── method1_verify.py          #   方式1 numpy 穷举版（小轮次可用）
-│   ├── method1_verify_r5.py       #   R=5 精确校验
-│   ├── method2_multistrategy.py   #   方式2 多策略（v2）
-│   ├── method2_v2plus.py          #   ★ 方式2 主算法（v2+）
-│   ├── method2_dominant.py        #   主导单路线探索
-│   ├── computecor_mitm_v3.py      #   MITM 探索（修正方向后的版本）
-│   ├── generate_docx_pure.py      #   论文生成（纯标准库，无 python-docx 依赖）
-│   └── generate_reports.py        #   分析报告生成
-└── archive/                       # 早期探索脚本（已被 src/ 下最终方法取代）
+├── results/                      # 结果数据
+│   ├── result.txt                # ★★ 最终提交（346 条 @(r,u,v,V_T,V_E)，318 有效）
+│   ├── result_method2_v2.txt     #   方式2 v2：c^R 固定取值（中间产物）
+│   ├── result_method2_v2plus.txt #   方式2 v2+：逐轮组合枚举（中间产物）
+│   ├── result_method2_merged.txt #   v2/v2plus 按条取最优（与 result.txt 等价）
+│   └── 自评得分.txt               #   自评得分与合规性说明
+└── src/                          # 核心算法实现
+    ├── computecor.cpp / Makefile #  方式1 穷举 2^32 明文（C++）
+    ├── method1_exact_dp.py       #  方式1 LAT 线性壳 DP（含 R=1 自检）
+    ├── method1_verify.py         #  方式1 numpy 穷举版（小轮次用）
+    ├── method1_verify_r5.py      #  R=5 精确校验
+    ├── method2_multistrategy.py  #  方式2 多策略候选（v2）
+    ├── method2_v2plus.py         # ★ 方式2 主算法（v2+）
+    ├── merge_v2_v2plus.py        # ★ v2/v2plus 按条取最优合并
+    ├── generate_docx_pure.py     #  论文生成（纯标准库 OOXML，含图表 / 样式 / 页码）
+    ├── generate_reports.py       #  分析报告生成
+    └── make_charts.py            #  论文插图生成（PIL + numpy，无 matplotlib 依赖）
 ```
 
 ## 快速开始
 
-无需第三方依赖，纯 Python 标准库即可运行核心算法：
+**一键复现**（推荐，验证提交目录内的程序确实能生成 result.txt）：
+
+```bash
+python run_all.py
+```
+
+`run_all.py` 会自动完成 v2 → v2plus → merge 整条链路，校验结果与
+`results/result.txt` 逐条一致，并复算得分（实测 `[PASS] 346 条全部一致，
+有效 318/346，钳制后总分 2996.53`）。
+
+**分步运行**：
 
 ```bash
 # 方式1：R=1 精确自检（应输出 -0.25，验证实现正确性）
 python src/method1_exact_dp.py
 
-# 方式2：由 V_T 数据估计 V_E，生成 result_method2_v2plus.txt
-python src/method2_v2plus.py
-
-# 重新生成分析报告（读取 results/result.txt）
-python src/generate_reports.py
+# 方式2：v2 多策略候选（需在 results/ 目录运行以正确解析 result.txt）
+cd results && python ../src/method2_multistrategy.py
+cd results && python ../src/method2_v2plus.py
+cd results && python ../src/merge_v2_v2plus.py
 ```
 
 方式 1 的 C++ 穷举版本：
@@ -184,12 +193,21 @@ python src/generate_reports.py
 cd src && make && ./computecor
 ```
 
+**重生成论文与图表**：
+
+```bash
+python src/make_charts.py        # 生成 docs/chart_*.png
+python src/generate_docx_pure.py # 生成 docs/saiti3_paper.docx
+python src/generate_reports.py   # 生成 docs/赛题三_*.html
+```
+
 ## 环境说明
 
-- 核心算法（方式 2、方式 1 的 LAT DP、报告/论文生成）**仅需 Python 3 标准库**。
-- `src/method1_verify.py` 需要 `numpy`；`src/computecor.cpp` 需要 C++ 编译器（`g++`）。
+- 核心算法（方式 1 LAT DP、方式 2 全部策略、合并、报告/论文生成）**仅需 Python 3 标准库**。
+- `src/method1_verify.py` 需要 `numpy`；`src/make_charts.py` 需要 `Pillow` + `numpy`；
+  `src/computecor.cpp` 需要 C++ 编译器（`g++`）。
 - 论文 `docs/saiti3_paper.docx` 由 `generate_docx_pure.py` 用 `zipfile` + 原始 OOXML 生成，
-  刻意不依赖 `python-docx` / `lxml`（托管 venv 中二者安装损坏）。
+  含中文字体（黑体/宋体/仿宋）、1.5 倍行距、自动页码、3 张 PNG 插图，居中显示与图题。
 
 ## 许可证
 

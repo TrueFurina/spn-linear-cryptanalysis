@@ -10,10 +10,16 @@ pick the combination whose |V_E| lands in [0.75|V_T|, 1.25|V_T|]
 AND same sign as V_T, maximizing score = log2(2^(2R) * |V_E|).
 This is the piling-up lemma with per-round approximation selection from LAT.
 """
-import math, re, sys, io
+import os, math, re, sys, io
 from itertools import combinations_with_replacement
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+# Auto-locate results/ so this script runs from any cwd (repo root or results/)
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_RS = os.path.join(os.path.dirname(_HERE), 'results')
+if os.path.isdir(_RS) and os.path.exists(os.path.join(_RS, 'result_method2_v2.txt')):
+    os.chdir(_RS)
 
 BASE = [0.125, 0.25, 0.375, 0.5]  # |LAT|/16 for |LAT| = 2,4,6,8
 
