@@ -16,11 +16,17 @@ Transition is a matrix multiply: C_R(u,v) = (M^R)[v][u],
 We build L^T (value space) from the C++ SR+MC recurrence, invert it over
 GF(2)^32 to get L^{-T}, then run sparse DP for R up to R_MAX.
 """
-import math, re, sys, io
+import os, math, re, sys, io
 from itertools import product
 from collections import defaultdict
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', write_through=True)
+
+# Auto-locate results/ so this script runs from any cwd (repo root or results/)
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_RS = os.path.join(os.path.dirname(_HERE), 'results')
+if os.path.isdir(_RS) and os.path.exists(os.path.join(_RS, 'result_method2_merged.txt')):
+    os.chdir(_RS)
 
 SBOX = [0xC,0x6,0x9,0x0,0x1,0xA,0x2,0xB,0x3,0x8,0x5,0xD,0x4,0xE,0x7,0xF]
 LAT = [[0]*16 for _ in range(16)]
