@@ -9,7 +9,13 @@ Usage:  python merge_v2_v2plus.py   (run inside results/, or see run_all.py)
 Input : result_method2_v2.txt, result_method2_v2plus.txt
 Output: result_method2_merged.txt
 """
-import re, math
+import os, re, math
+
+# Auto-locate results/ so this script runs from any cwd (repo root or results/)
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_RS = os.path.join(os.path.dirname(_HERE), 'results')
+if os.path.isdir(_RS) and os.path.exists(os.path.join(_RS, 'result_method2_v2.txt')):
+    os.chdir(_RS)
 
 V2 = 'result_method2_v2.txt'
 V2P = 'result_method2_v2plus.txt'
