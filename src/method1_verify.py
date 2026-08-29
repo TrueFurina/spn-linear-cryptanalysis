@@ -4,6 +4,7 @@ Method 1 (Exact) Verification - Vectorized Cipher Computation
 Computes V_T exactly for all entries using numpy vectorization.
 Processes plaintexts in batches to manage memory.
 """
+import os
 import numpy as np
 import math
 import re
@@ -12,6 +13,12 @@ import io
 import time
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+# Auto-locate results/ so this script runs from any cwd (repo root or results/)
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_RS = os.path.join(os.path.dirname(_HERE), 'results')
+if os.path.isdir(_RS) and os.path.exists(os.path.join(_RS, 'result.txt')):
+    os.chdir(_RS)
 
 # ========== Cipher Definition ========== 
 SBOX = [0xC,0x6,0x9,0x0,0x1,0xA,0x2,0xB,0x3,0x8,0x5,0xD,0x4,0xE,0x7,0xF]
