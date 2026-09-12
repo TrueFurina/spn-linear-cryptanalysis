@@ -73,19 +73,22 @@ def main():
         print(f'[错误] 缺少 {result}，请确认在提交包根目录运行。')
         sys.exit(1)
     n = sum(1 for _ in open(result, encoding='utf-8'))
-    print(f'[0/4] 输入 result.txt：{n} 条（含方式1 V_T）')
+    print(f'[0/5] 输入 result.txt：{n} 条（含方式1 V_T）')
 
     # 1. 方式2 策略 v2
-    run_step('1/4', 'method2_multistrategy.py', RESULTS)
+    run_step('1/5', 'method2_multistrategy.py', RESULTS)
 
     # 2. 方式2 主算法 v2+
-    run_step('2/4', 'method2_v2plus.py', RESULTS)
+    run_step('2/5', 'method2_v2plus.py', RESULTS)
 
     # 3. 合并取最优
-    run_step('3/4', 'merge_v2_v2plus.py', RESULTS)
+    run_step('3/5', 'merge_v2_v2plus.py', RESULTS)
 
-    # 4. 校验
-    print('\n[4/4] 校验 merged 与提交 result.txt ...')
+    # 4. V_T 精确性独立校验（不依赖方式1计算的可证伪检验）
+    run_step('4/5', 'verify_vt_exactness.py', RESULTS)
+
+    # 5. 校验
+    print('\n[5/5] 校验 merged 与提交 result.txt ...')
     merged = parse(os.path.join(RESULTS, 'result_method2_merged.txt'))
     orig = parse(result)
     if len(merged) != len(orig):
