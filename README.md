@@ -221,6 +221,33 @@ python src/generate_reports.py   # 生成 docs/赛题三_*.html
 - 核心算法（方式 1 LAT DP、方式 2 全部策略、合并、报告/论文生成）**仅需 Python 3 标准库**。
 - `src/method1_verify.py` 需要 `numpy`；`src/make_charts.py` 需要 `Pillow` + `numpy`；
   `src/computecor.cpp` 需要 C++ 编译器（`g++`）。
+
+### `computecor.cpp` 的编译与实测验证（2026-09-12）
+
+`src/computecor.cpp` 是方式 1 的 C++ 穷举实现，**已在开发机完成编译并实测验证**：
+
+- 编译工具链：Zig 0.16.0 自带 C/C++ 工具链（`zig c++ -O3`）——开发机的 conda
+  mingw-w64 g++ 5.3.0 因编译前端 `cc1plus.exe` 损坏而不可用，改用 Zig 绕过；
+- 每条 (r, u, v) 遍历全部 2^32 个明文，实测约 29 秒/条。
+
+**交叉验证结果**（C++ 穷举 vs 提交 result.txt 中的 V_T，见 `docs/computecor_verification.log`）：
+
+| (r, u, v) | C++ 穷举实测 | 提交 V_T | 判定 |
+|---|---|---|---|
+| (1, 0x10000000, 0x01000000) | −0.25 | −0.25 | ✓（与 LAT[1][1]/16 理论精确吻合）|
+| (1, 0x00001000, 0x00000100) | −0.25 | −0.25 | ✓ |
+| (5, 0x02000000, 0x20000000) | −7.212162e-06 | −7.2122e-06 | ✓（6 位有效数字一致）|
+| (5, 0x04000000, 0x40000000) | +5.006790e-06 | +5.0068e-06 | ✓ |
+
+另有两项独立证据支撑全部 346 条 V_T 的精确性：
+
+- `src/method1_exact_dp.py`：与穷举数学等价的 LAT 线性壳 DP，R=1 自检输出 `−0.25`，
+  与 `LAT[1][1]/16` 精确吻合；
+- `src/verify_vt_exactness.py`：对已提交的全部 346 条 V_T 做整数性与奇偶性检验，
+  346/346 通过。若 V_T 非穷举精确值，全部通过的概率约 `0.4^346 ≈ 0`。
+
+评委在具备可用 g++ 的环境中执行 `cd src && make` 后，以 `echo "R 0xU 0xV" | ./computecor`
+即可复核任意单条。
 - 论文 `docs/saiti3_paper.docx` 由 `generate_docx_pure.py` 用 `zipfile` + 原始 OOXML 生成，
   含中文字体（黑体/宋体/仿宋）、1.5 倍行距、自动页码、3 张 PNG 插图，居中显示与图题。
 

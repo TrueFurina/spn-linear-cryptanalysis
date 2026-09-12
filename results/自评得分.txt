@@ -18,8 +18,11 @@
 
 方式1（精确 V_T）说明:
 V_T 由穷举全部 2^32 个明文（C++ 实现 computecor.cpp）精确计算，
-等价于基于 LAT 的线性壳动态规划（method1_exact_dp.py）。R=1 条目
-已用 LAT 理论交叉验证，精确吻合（V_T = -0.25）。
+等价于基于 LAT 的线性壳动态规划（method1_exact_dp.py）。
+computecor.cpp 已于 2026-09-12 用 Zig 0.16.0 编译（zig c++ -O3）并实测：
+对 R=1 两条与 R=5 两条共 4 条做 2^32 穷举，结果与提交 V_T 全部吻合
+（R=1 得 -0.25 与 LAT 理论精确一致；R=5 如 -7.212162e-06 vs -7.2122e-06），
+详见 docs/computecor_verification.log。
 
 V_T 精确性的独立可证伪校验（src/verify_vt_exactness.py）：
 穷举定义下 S = Σ_x (-1)^(u·x ⊕ v·F^r(x)) 为整数，V_T = S/2^32，故必有两条必要条件：
